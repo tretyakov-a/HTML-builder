@@ -1,10 +1,23 @@
-const output = require('./output');
+const fs = require('fs');
+const path = require('path');
 
 const MESSAGES = {
   WELCOME: 'Hello! Write something. Use [Ctrl + C] or [exit] command for exit.',
   FAREWELL: 'Good bye!',
 };
 const COMMAND_EXIT = 'exit';
+const OUTPUT_FILE = 'output.txt';
+const filePath = path.join(__dirname ,OUTPUT_FILE);
+
+const output = new Promise((resolve, reject) => {
+  const writeStream = fs.createWriteStream(filePath, { encoding: 'utf8' });
+  writeStream.on('error', (err) => {
+    reject(err);
+  });
+  writeStream.on('ready', () => {
+    resolve(writeStream);
+  });
+});
 
 async function init() {
   try {
