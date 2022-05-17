@@ -1,25 +1,34 @@
-const { writeLine } = require('./output');
-const readline = require('readline');
+const output = require('./output');
 
 const MESSAGES = {
   WELCOME: 'Hello! Write something. Use [Ctrl + C] or [exit] command for exit.',
   FAREWELL: 'Good bye!',
 };
-const rl = readline.createInterface({ input: process.stdin });
-
 const COMMAND_EXIT = 'exit';
-const handleExit = () => {
-  console.log(MESSAGES.FAREWELL);
-  rl.close();
-  process.exit(0);
-};
 
-rl.on('line', (input) => {
-  if (input.trim() === COMMAND_EXIT) {
-    return handleExit();
+async function init() {
+  try {
+    const writeStream = await output; 
+
+    const handleExit = () => {
+      console.log(MESSAGES.FAREWELL);
+      writeStream.close();
+      process.exit(0);
+    };
+    
+    process.stdin.on('data', (chunk) => {
+      const line = chunk.toString();
+      if (line.trim() === COMMAND_EXIT) {
+        return handleExit();
+      }
+      writeStream.write(line);
+    });
+    
+    console.log(MESSAGES.WELCOME);
+    process.on('SIGINT', handleExit);
+  } catch (err) {
+    console.log(err);
   }
-  writeLine(input);
-});
+}
 
-console.log(MESSAGES.WELCOME);
-process.on('SIGINT', handleExit);
+init();
