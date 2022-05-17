@@ -8,15 +8,14 @@ const MESSAGES = {
 const rl = readline.createInterface({ input: process.stdin });
 
 const COMMAND_EXIT = 'exit';
-const exitCommandRegexp = new RegExp(`^${COMMAND_EXIT}$`);
 const handleExit = () => {
   console.log(MESSAGES.FAREWELL);
   rl.close();
-  process.exit();
+  process.exit(0);
 };
 
 rl.on('line', (input) => {
-  if (input.toString().match(exitCommandRegexp)) {
+  if (input.trim() === COMMAND_EXIT) {
     return handleExit();
   }
   writeLine(input);
