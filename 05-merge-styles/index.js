@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-const EXT = '.css';
+const CSS_EXT = '.css';
 const BUNDLE_NAME = 'bundle.css';
 const DIST_DIRECTORY = 'project-dist';
 const STYLES_DIRECTORY = 'styles';
@@ -9,7 +9,7 @@ const STYLES_DIRECTORY = 'styles';
 const bundleFilePath = path.resolve(__dirname, DIST_DIRECTORY, BUNDLE_NAME);
 const stylesDirPath = path.resolve(__dirname, STYLES_DIRECTORY);
 
-async function getStyleFilePaths(dirPath) {
+async function getFilePaths(dirPath, ext) {
   const data = [];
 
   const readDir = async (dir) => {
@@ -18,7 +18,7 @@ async function getStyleFilePaths(dirPath) {
       const filePath = path.join(dir, file.name);
       if (file.isDirectory()) {
         await readDir(filePath);
-      } else if (path.extname(file.name) === EXT) {
+      } else if (path.extname(file.name) === ext) {
         data.push(filePath);
       }
     }));
@@ -28,10 +28,10 @@ async function getStyleFilePaths(dirPath) {
   return data;
 }
 
-async function makeStyleBundle() {
+async function makeStyleBundle(dir, bundle) {
   try {
-    const cssFilePaths = await getStyleFilePaths(stylesDirPath);
-    const outputFileHandle = await fs.open(bundleFilePath, 'w');
+    const cssFilePaths = await getFilePaths(dir, CSS_EXT);
+    const outputFileHandle = await fs.open(bundle, 'w');
 
     const filesData = await Promise.all(cssFilePaths.map(async (filePath) => {
       const inputFileHandle = await fs.open(filePath, 'r');
@@ -47,4 +47,9 @@ async function makeStyleBundle() {
   }
 }
 
-makeStyleBundle();
+makeStyleBundle(stylesDirPath, bundleFilePath);
+
+module.exports = {
+  makeStyleBundle,
+  getFilePaths,
+};
