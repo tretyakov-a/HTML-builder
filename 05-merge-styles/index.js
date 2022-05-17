@@ -33,13 +33,14 @@ async function makeStyleBundle() {
     const cssFilePaths = await getStyleFilePaths(stylesDirPath);
     const outputFileHandle = await fs.open(bundleFilePath, 'w');
 
-    await Promise.all(cssFilePaths.map(async (filePath) => {
+    const filesData = await Promise.all(cssFilePaths.map(async (filePath) => {
       const inputFileHandle = await fs.open(filePath, 'r');
       const data = await inputFileHandle.readFile();
-      await outputFileHandle.writeFile(data);
-      return inputFileHandle.close();
+      await inputFileHandle.close();
+      return data;
     }));
 
+    await outputFileHandle.writeFile(filesData.join(''));
     await outputFileHandle.close();
   } catch (err) {
     console.error(err);
