@@ -15,7 +15,7 @@ function logFileInfo(fileName, stats) {
 async function processFile(filePath) {
   const fileStats = await fs.stat(filePath);
   if (fileStats.isDirectory()) {
-    readDirectory(filePath);
+    await readDirectory(filePath);
   } else {
     logFileInfo(filePath, fileStats);
   }
@@ -24,10 +24,10 @@ async function processFile(filePath) {
 async function readDirectory(dirPath) {
   try {
     const files = await fs.readdir(dirPath);
-    files.forEach((file) => {
+    await Promise.all(files.map(async (file) => {
       const filePath = path.join(dirPath, file);
-      processFile(filePath);
-    });
+      await processFile(filePath);
+    }));
   } catch (err) {
     console.error(err);
   }

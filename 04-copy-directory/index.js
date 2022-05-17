@@ -9,7 +9,7 @@ async function copyDirectory(source, destination) {
   try {
     await fs.mkdir(destination, { recursive: true });
     const files = await fs.readdir(source, { withFileTypes: true });
-    files.forEach(async (file) => {
+    await Promise.all(files.map(async (file) => {
       const srcFilePath = path.join(source, file.name);
       const destFilePath = path.join(destination, file.name);
       if (file.isDirectory()) {
@@ -17,7 +17,7 @@ async function copyDirectory(source, destination) {
       } else {
         await fs.copyFile(srcFilePath, destFilePath);
       }
-    });
+    }));
   } catch (error) {
     console.error(error);
   }
