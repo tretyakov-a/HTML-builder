@@ -27,7 +27,7 @@ async function loadComponents() {
   return (await loadFiles(componentFilePaths))
     .reduce((acc, data, i) => {
       const { name } = path.parse(componentFilePaths[i]);
-      return { ...acc, [name]: data };
+      return { ...acc, [name]: data.toString() };
     }, {});
 }
 
@@ -36,7 +36,7 @@ async function buildHtml() {
   let templateData = await fs.readFile(htmlTemplatePath, { encoding: 'utf8' });
   Object.keys(components).forEach((componentName) => {
     const templateString = `{{${componentName}}}`;
-    templateData = templateData.replace(templateString, components[componentName].toString());
+    templateData = templateData.replace(templateString, components[componentName]);
   });
   
   await fs.writeFile(htmlIndexPath, templateData);

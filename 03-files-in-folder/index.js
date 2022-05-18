@@ -14,19 +14,17 @@ function logFileInfo(fileName, stats) {
 
 async function processFile(filePath) {
   const fileStats = await fs.stat(filePath);
-  if (fileStats.isDirectory()) {
-    await readDirectory(filePath);
-  } else {
-    logFileInfo(filePath, fileStats);
-  }
+  return fileStats.isDirectory()
+    ? readDirectory(filePath)
+    : logFileInfo(filePath, fileStats);
 }
 
 async function readDirectory(dirPath) {
   try {
     const files = await fs.readdir(dirPath);
-    await Promise.all(files.map(async (file) => {
+    await Promise.all(files.map((file) => {
       const filePath = path.join(dirPath, file);
-      await processFile(filePath);
+      return processFile(filePath);
     }));
   } catch (err) {
     console.error(err);
