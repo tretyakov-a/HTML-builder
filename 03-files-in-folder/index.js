@@ -14,9 +14,8 @@ function logFileInfo(fileName, stats) {
 
 async function processFile(filePath) {
   const fileStats = await fs.stat(filePath);
-  return fileStats.isDirectory()
-    ? readDirectory(filePath)
-    : logFileInfo(filePath, fileStats);
+  if (!fileStats.isDirectory())
+    logFileInfo(filePath, fileStats);
 }
 
 async function readDirectory(dirPath) {
