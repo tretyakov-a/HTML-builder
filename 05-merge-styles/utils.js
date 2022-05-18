@@ -22,26 +22,25 @@ async function getFilePaths(dirPath, ext) {
   return data;
 }
 
+async function loadFiles(filePaths) {
+  return await Promise.all(filePaths.map(async (filePath) => {
+    const data = await fs.readFile(filePath);
+    return data;
+  }));
+}
+
 async function makeStyleBundle(dir, bundle) {
   try {
     const cssFilePaths = await getFilePaths(dir, CSS_EXT);
-    const outputFileHandle = await fs.open(bundle, 'w');
-
-    const filesData = await Promise.all(cssFilePaths.map(async (filePath) => {
-      const inputFileHandle = await fs.open(filePath, 'r');
-      const data = await inputFileHandle.readFile();
-      await inputFileHandle.close();
-      return data;
-    }));
-
-    await outputFileHandle.writeFile(filesData.join(''));
-    await outputFileHandle.close();
-  } catch (err) {
+    const filesData = await loadFiles(cssFilePaths);
+    await fs.writeFile(bundle, filesData.join(''));
+  } catch(err) {
     console.error(err);
   }
 }
 
 module.exports = {
-  makeStyleBundle,
   getFilePaths,
+  loadFiles,
+  makeStyleBundle,
 };
