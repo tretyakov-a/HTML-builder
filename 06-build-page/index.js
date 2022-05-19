@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const path = require('path');
 const copyDirectory = require('../04-copy-directory/utils');
-const { getFilePaths, loadFiles, makeStyleBundle } = require('../05-merge-styles/utils');
+const { getFilePaths, makeStyleBundle } = require('../05-merge-styles/utils');
 
 const HTML_EXT = '.html';
 const STYLES_BUNDLE_NAME = 'style.css';
@@ -22,12 +22,18 @@ const htmlTemplatePath = path.join(__dirname, HTML_TEMPLATE_NAME);
 const htmlComponentsDirPath = path.join(__dirname, COMPONENTS_DIRECTORY);
 const htmlIndexPath = path.join(distPath, HTML_INDEX_NAME);
 
+async function loadFiles(filePaths) {
+  return await Promise.all(
+    filePaths.map(async (filePath) => fs.readFile(filePath, { encoding: 'utf8' }))
+  );
+}
+
 async function loadComponents() {
   const componentFilePaths = await getFilePaths(htmlComponentsDirPath, HTML_EXT);
   return (await loadFiles(componentFilePaths))
     .reduce((acc, data, i) => {
       const { name } = path.parse(componentFilePaths[i]);
-      return { ...acc, [name]: data.toString() };
+      return { ...acc, [name]: data };
     }, {});
 }
 
