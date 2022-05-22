@@ -31,5 +31,3 @@ rl.on('close', () => {
   console.log(MESSAGES.FAREWELL);
   process.exitCode = 0;
 });
-
-process.on('SIGINT', () => rl.close());
