@@ -22,8 +22,8 @@ const htmlTemplatePath = path.join(__dirname, HTML_TEMPLATE_NAME);
 const htmlComponentsDirPath = path.join(__dirname, COMPONENTS_DIRECTORY);
 const htmlIndexPath = path.join(distPath, HTML_INDEX_NAME);
 
-async function loadFiles(filePaths) {
-  return await Promise.all(
+function loadFiles(filePaths) {
+  return Promise.all(
     filePaths.map(async (filePath) => fs.readFile(filePath, { encoding: 'utf8' }))
   );
 }
@@ -51,10 +51,12 @@ async function buildHtml() {
 async function buildPage() {
   try {
     await fs.rm(distPath, { recursive: true, force: true });
-    await fs.mkdir(distPath, { recursive: true });
-    await copyDirectory(assetsSrcPath, assetsDestPath);
-    await makeStyleBundle(stylesSrcPath, stylesBundlePath);
-    await buildHtml();
+    await fs.mkdir(distPath);
+    await Promise.all([
+      copyDirectory(assetsSrcPath, assetsDestPath),
+      makeStyleBundle(stylesSrcPath, stylesBundlePath),
+      buildHtml(),
+    ]);
   } catch (err) {
     console.error(err);
   }

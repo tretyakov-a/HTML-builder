@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 
 const MESSAGES = {
   WELCOME: 'Hello! Write something. Use [Ctrl + C] or [exit] command for exit.',
@@ -9,39 +10,26 @@ const COMMAND_EXIT = 'exit';
 const OUTPUT_FILE = 'output.txt';
 const filePath = path.join(__dirname ,OUTPUT_FILE);
 
-const output = new Promise((resolve, reject) => {
-  const writeStream = fs.createWriteStream(filePath, { encoding: 'utf8' });
-  writeStream.on('error', (err) => {
-    reject(err);
-  });
-  writeStream.on('ready', () => {
-    resolve(writeStream);
-  });
+const writeStream = fs.createWriteStream(filePath);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
 });
 
-async function init() {
-  try {
-    const writeStream = await output; 
+console.log(MESSAGES.WELCOME);
 
-    const handleExit = () => {
-      console.log(MESSAGES.FAREWELL);
-      writeStream.close();
-      process.exit(0);
-    };
-    
-    process.stdin.on('data', (chunk) => {
-      const line = chunk.toString();
-      if (line.trim() === COMMAND_EXIT) {
-        return handleExit();
-      }
-      writeStream.write(line);
-    });
-    
-    console.log(MESSAGES.WELCOME);
-    process.on('SIGINT', handleExit);
-  } catch (err) {
-    console.log(err);
+rl.on('line', (line) => {
+  if (line.trim() === COMMAND_EXIT) {
+    return rl.close();
   }
-}
+  writeStream.write(`${line}\n`);
+});
 
-init();
+rl.on('SIGINT', () => rl.close());
+
+rl.on('close', () => {
+  console.log(MESSAGES.FAREWELL);
+  process.exitCode = 0;
+});
+
+process.on('SIGINT', () => rl.close());

@@ -4,27 +4,27 @@ const path = require('path');
 const DIRECTORY_NAME = 'secret-folder';
 const directoryPath = path.join(__dirname, DIRECTORY_NAME);
 
-function logFileInfo(fileName, stats) {
+function getFileInfo(fileName, { size }) {
   let { name, ext } = path.parse(fileName);
   ext = ext.length !== 0 ? ext.slice(1) : '[no ext]';
-  const fileSize = stats.size;
-  const fileSizeInKb = (fileSize / 1024).toFixed(3);
-  console.log(`${name} - ${ext} - ${fileSizeInKb}kb`);
+  const fileSizeInKb = (size / 1024).toFixed(3);
+  return `${name} - ${ext} - ${fileSizeInKb}kb`;
 }
 
 async function processFile(filePath) {
   const fileStats = await fs.stat(filePath);
-  if (!fileStats.isDirectory())
-    logFileInfo(filePath, fileStats);
+  return getFileInfo(filePath, fileStats);
 }
 
 async function readDirectory(dirPath) {
   try {
-    const files = await fs.readdir(dirPath);
-    await Promise.all(files.map((file) => {
-      const filePath = path.join(dirPath, file);
-      return processFile(filePath);
-    }));
+    const files = await fs.readdir(dirPath, { withFileTypes: true });
+    const filesStats = await Promise.all(
+      files
+        .filter((file) => file.isFile())
+        .map(({ name }) => processFile(path.join(dirPath, name)))
+    );
+    console.log(filesStats.join('\n'));
   } catch (err) {
     console.error(err);
   }

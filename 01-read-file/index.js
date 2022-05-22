@@ -3,7 +3,7 @@ const path = require('path');
 
 const INPUT_FILE = 'text.txt';
 const filePath = path.join(__dirname, INPUT_FILE);
-const stream = fs.createReadStream(filePath, { highWaterMark: 8 , encoding: 'utf8'});
+const stream = fs.createReadStream(filePath, { encoding: 'utf8'});
 let allData = '';
 
 stream.on('data', (chunk) => {
