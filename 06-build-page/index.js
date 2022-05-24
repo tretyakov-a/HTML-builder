@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const path = require('path');
-const copyDirectory = require('../04-copy-directory/utils');
-const { getFilePaths, makeStyleBundle } = require('../05-merge-styles/utils');
+const copyDirectory = require('../04-copy-directory');
+const { getFilePaths, makeStyleBundle } = require('../05-merge-styles');
 
 const HTML_EXT = '.html';
 const STYLES_BUNDLE_NAME = 'style.css';
