@@ -7,8 +7,8 @@ const directoryPath = path.join(__dirname, DIRECTORY_NAME);
 function getFileInfo(fileName, { size }) {
   let { name, ext } = path.parse(fileName);
   ext = ext.length !== 0 ? ext.slice(1) : '[no ext]';
-  const fileSizeInKb = (size / 1024).toFixed(3);
-  return `${name} - ${ext} - ${fileSizeInKb}kb`;
+  // const fileSizeInKb = (size / 1024).toFixed(3);
+  return `${name} - ${ext} - ${size}`;
 }
 
 async function processFile(filePath) {
