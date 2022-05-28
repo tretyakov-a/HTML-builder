@@ -3,15 +3,10 @@ const path = require('path');
 
 const INPUT_FILE = 'text.txt';
 const filePath = path.join(__dirname, INPUT_FILE);
-const stream = fs.createReadStream(filePath, { encoding: 'utf8'});
-let allData = '';
+const stream = fs.createReadStream(filePath, { encoding: 'utf8', highWaterMark: 16 });
 
 stream.on('data', (chunk) => {
-  allData += chunk;
-});
-
-stream.on('end', () => {
-  console.log(allData);
+  process.stdout.write(chunk);
 });
 
 stream.on('error', function(err) {
